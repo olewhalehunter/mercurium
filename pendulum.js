@@ -56,8 +56,6 @@ function drawCircle(x, y, r){
     context.lineWidth = 1;
     context.beginPath();
     context.arc(center+x*pL, center+y*pL, r, 0, 2 * Math.PI, false);
-    context.fillStyle = 'black';
-    context.fill();
     context.stroke();
 }
 
@@ -133,6 +131,13 @@ function drawImage(){
     }
 }
 
+function clearImage(){
+    lineList = [];
+    rList = [];
+    thetaList = [];
+    drawGraph();
+}
+
 function drawPendulum(){
     drawLine(jointB[0], jointB[1],
 	     jointA[0], jointA[1]);
@@ -144,7 +149,7 @@ function graphSignals(){
 	drawLineRaw(30+x, 350, 30+x, 
 		    350 + thetaList[x]*.2);
 
-	drawLineRaw(30+x, 450, 30+x, 450+rList[x]*29);
+	drawLineRaw(30+x, 450, 30+x, 450+(rList[x]-1)*29);
     }
 }
 
@@ -154,20 +159,18 @@ function cycleSignals(){
     var theta = angleBetween(jointA, jointB);
 
     rList.push(r);    
-
     thetaList.push(theta);
 	
 
-    if (rList.length > 300){
-	rList = rList.slice(1, 300);
-	thetaList = thetaList.slice(1, 300);
+    if (rList.length > 400){
+	rList = rList.slice(1, 400);
+	thetaList = thetaList.slice(1, 400);
     }
 }
 
 function calcPendulum(){   
     drawPendulum();
     drawImage();
-    graphSignals();
 
     if (mouseDown){
 	drawPoint();
@@ -210,6 +213,7 @@ canvas.addEventListener('mouseup', function(evt) {
 
 function drawGraph(){
     context.clearRect(0, 0, canvas.width, canvas.height);
+    drawCircle(0, 0, 2*pL);
 
     drawLine(0, 0, center, 0);
     drawLine(0, 0, 0, center);
@@ -220,11 +224,11 @@ function drawGraph(){
     // print("X", 0+20, center-20);
     // print("Y", center+20, 0+50);
     drawImage();
-    
+    graphSignals();
 }
 
 
-// drawGraph();
-// drawPendulum();
+drawGraph();
+//drawPendulum();
 // print("x,y: " + jointB[0] + "," + jointB[1]
 //     , 20, 20);
