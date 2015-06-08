@@ -37,6 +37,11 @@ var pL = center/2; // pendulum bar length
 var rList = [];
 var thetaList = [];
 
+var rSum = 0;
+var thetaSum = 0;
+var rAverage = 0;
+var thetaAverage = 0;
+
 function print(message, x , y) {
     context.font = '8pt Calibri';
     context.fillStyle = 'black';
@@ -136,6 +141,48 @@ function clearImage(){
     rList = [];
     thetaList = [];
     drawGraph();
+    rSum = 0;
+    thetaSum = 0;
+    rAverage = 0;
+    thetaAverage = 0;
+}
+
+function rgbToHex(r, g, b) {
+    if (r > 255 || g > 255 || b > 255)
+        throw "Invalid color component";
+    return ((r << 16) | (g << 8) | b).toString(16);
+}
+
+function getCanvasRGB(x, y){
+    var p =  context.getImageData(x, y, 1, 1).data; 
+    return [p[0], p[1], p[2]];
+}
+
+// var pixel = context.createImageData(1,1);
+// var pixDat = pixel.data;
+// var hitMap = [];
+// for (i = 0; i < 50; i++){
+//     hitMap[i] = [];
+//     for (j = 0; j < 50; j++){
+// 	if (getCanvasRGB(i,j) != [0, 0, 0])
+// 	    hitMap[i][j] = true;
+//     }
+// }
+
+function putPixel(x, y, color){
+    context.fillStyle = "#000";
+    context.fillRect(center, center, 1, 1);   
+}
+
+for (var x = 0; x < 500; x++) 
+{ console.log(getCanvasRGB(x, x)) }
+
+function fillArea(x, y, color){
+    for (i = 0; i< 5; i++){
+	for (k = 0; k < 5; k++){
+	    putPixel(x+i, y+k, color);
+	}
+    }
 }
 
 function drawPendulum(){
@@ -147,9 +194,13 @@ function graphSignals(){
     for (var x = 1; x < thetaList.length-1; x+=2){
 
 	drawLineRaw(30+x, 350, 30+x, 
-		    350 + thetaList[x]*.2);
+		    350 + thetaList[x] * 5
+	    / thetaAverage
+	);
 
-	drawLineRaw(30+x, 450, 30+x, 450+(rList[x]-1)*29);
+	drawLineRaw(30+x, 450, 
+		    30+x, 450+(rList[x]-1)*50
+	    / rAverage);
     }
 }
 
@@ -159,23 +210,32 @@ function cycleSignals(){
     var theta = angleBetween(jointA, jointB);
 
     rList.push(r);    
-    thetaList.push(theta);
-	
+    thetaList.push(theta);	
+    rSum += r;
+    thetaSum += theta;
 
     if (rList.length > 400){
+	thetaSum -= thetaList[0];
+	rSum -= thetaList[0];
 	rList = rList.slice(1, 400);
 	thetaList = thetaList.slice(1, 400);
     }
+
+    rAverage = rSum/rList.length;
+    thetaAverage = thetaSum/thetaList.length;
 }
 
 function calcPendulum(){   
-    drawPendulum();
+    //drawPendulum();
     drawImage();
+    
+
 
     if (mouseDown){
 	drawPoint();
 	cycleSignals();
     }	
+    fillArea(center, center, [255, 255, 255]);
 }
 
 function drawPoint(){
@@ -215,11 +275,11 @@ function drawGraph(){
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawCircle(0, 0, 2*pL);
 
-    drawLine(0, 0, center, 0);
-    drawLine(0, 0, 0, center);
+    // drawLine(0, 0, center, 0);
+    // drawLine(0, 0, 0, center);
 
-    drawLine(0-center, 0, 0, 0);
-    drawLine(0, 0-center, 0, 0);
+    // drawLine(0-center, 0, 0, 0);
+    // drawLine(0, 0-center, 0, 0);
 
     // print("X", 0+20, center-20);
     // print("Y", center+20, 0+50);
