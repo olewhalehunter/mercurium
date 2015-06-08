@@ -23,10 +23,9 @@ var context = canvas.getContext('2d');
 var center = canvas.width/2;
 var jointA = [0 , 0];
 var jointB = [2 , 2];
-var jointC = [1 , 1];
 
-var angleA = cos(0);
-var angleB = cos(0);
+var theta = cos(0);
+var r = 0;
 
 var lineList = [];
 
@@ -35,6 +34,10 @@ var lastPoint = [0, 0];
 var mouseDown = false;
 
 var pL = center/2; // pendulum bar length
+
+var rList = [];
+var thetaList = [];
+
 
 function print(message, x , y) {
     context.font = '8pt Calibri';
@@ -72,8 +75,8 @@ function drawLine(xA, yA, xB, yB){
 function drawLineRaw(xA, yA, xB, yB){
     context.lineWidth = 1;
     context.beginPath();
-    context.moveTo(center+xA*pL,center+yA);
-    context.lineTo(center+xB,center+yB);
+    context.moveTo(xA,yA);
+    context.lineTo(xB,yB);
     context.stroke();
     context.closePath();
 }
@@ -119,6 +122,12 @@ function distance(a, b){
     return Math.sqrt( (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]) );
 }
 
+function angleBetween(a, b){
+    return Math.atan2(b[1] -a [1],
+		      b[0] - a[0]) * 180/pi;
+    
+}
+
 function drawImage(){
     for (var i =0; i<lineList.length; i++){
 	drawLine(lineList[i][0][0], lineList[i][0][1], 
@@ -127,53 +136,39 @@ function drawImage(){
 }
 
 function drawPendulum(){
-    jointA = [0, 0];
-    
-    drawCircle(jointA[0], jointA[1], 3);
-    print("A", jointA[0]*pL+center+20, jointA[1]*pL+center-20);
-
-    drawCircle(jointB[0], jointB[1], 3);
-    print("B", jointB[0]*pL+center+20, jointB[1]*pL+center-20);
-
-    drawCircle(jointC[0], jointC[1], 3);
-    print("C", jointC[0]*pL+center+20, jointC[1]*pL+center-20);
-    
-    drawLine(jointA[0], jointA[1],
-	     jointC[0], jointC[1]);
     drawLine(jointB[0], jointB[1],
-	     jointC[0], jointC[1]);
-
+	     jointA[0], jointA[1]);
 }
 
-function calcPendulum(){
+function graphSignals(){
+    for (var x = 0; x < thetaList.length; x++){
+	drawLineRaw(30+x, 400, 30+x, 350+thetaList[x]*.2);
 
-    //drawGraph();
-
-    jointA = [0, 0];
-    found = false;
-    for (a = -2*pi; a< (2*pi); a += (pi/50) ){
-	
-	cPosB = [jointB[0] + cos(a), 
-		 jointB[1] + sin(a)];
-
-	for (b = 2*pi; b>(-2*pi); b-=(pi/30)){
-	    cPosA = [jointA[0] + cos(b), jointA[1]+ sin(b)];
-
-	    if (distance( cPosA, cPosB) <= .5){
-		jointC[0] = jointA[0] - cos(a);
-		jointC[1] = jointA[1] - sin(a);	
-		
-		found = true;
-		if (mouseDown)
-		    drawPoint();
-		break;
-	    }
-	}
-	if (found)
-	    break;
+	drawLineRaw(30+x, 450, 30+x, 450+rList[x]*20);
     }
+}
+
+function cycleSignals(){
+    rList.push(
+	distance(jointA, jointB));    
+    thetaList.push(
+	angleBetween(jointA, jointB));
+
+    if (rList.length > 300){
+	rList = rList.slice(1, 300);
+	thetaList = thetaList.slice(1, 300);
+    }
+}
+
+function calcPendulum(){   
     drawPendulum();
     drawImage();
+    graphSignals();
+
+    if (mouseDown){
+	drawPoint();
+	cycleSignals();
+    }	
 }
 
 function drawPoint(){
@@ -188,7 +183,6 @@ canvas.addEventListener('mousemove', function(evt) {
 
     jointB = [(mousePos.x - center)/pL, 
      	      (mousePos.y - center)/pL];
-    jointA = [0, 0];
 
     if (distance( jointA, jointB) <= 2){
 	calcPendulum();
