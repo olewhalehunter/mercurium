@@ -7,7 +7,7 @@
 */
 
 // image to signal export -> dat file
-// signal to image import 
+// dat file signal -> image import
 // create floodfill colors between lines
 // record dot map of floodfills
 
@@ -174,8 +174,8 @@ function putPixel(x, y, color){
     context.fillRect(center, center, 1, 1);   
 }
 
-for (var x = 0; x < 500; x++) 
-{ console.log(getCanvasRGB(x, x)) }
+// for (var x = 0; x < 500; x++) 
+// { console.log(getCanvasRGB(x, x)) }
 
 function fillArea(x, y, color){
     for (i = 0; i< 5; i++){
