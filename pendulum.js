@@ -6,9 +6,8 @@
  licended GNU AGPL3
 */
 
-// get relative x,y coords canvas -> display
-// draw pendulum /calc angles from x,y coords
-// record angles by step for draw sequence
+// image to signal export -> dat file
+// signal to image import 
 // create floodfill colors between lines
 // record dot map of floodfills
 
@@ -37,7 +36,6 @@ var pL = center/2; // pendulum bar length
 
 var rList = [];
 var thetaList = [];
-
 
 function print(message, x , y) {
     context.font = '8pt Calibri';
@@ -141,18 +139,24 @@ function drawPendulum(){
 }
 
 function graphSignals(){
-    for (var x = 0; x < thetaList.length; x++){
-	drawLineRaw(30+x, 400, 30+x, 350+thetaList[x]*.2);
+    for (var x = 1; x < thetaList.length-1; x+=2){
 
-	drawLineRaw(30+x, 450, 30+x, 450+rList[x]*20);
+	drawLineRaw(30+x, 350, 30+x, 
+		    350 + thetaList[x]*.2);
+
+	drawLineRaw(30+x, 450, 30+x, 450+rList[x]*29);
     }
 }
 
 function cycleSignals(){
-    rList.push(
-	distance(jointA, jointB));    
-    thetaList.push(
-	angleBetween(jointA, jointB));
+
+    var r = distance(jointA, jointB);
+    var theta = angleBetween(jointA, jointB);
+
+    rList.push(r);    
+
+    thetaList.push(theta);
+	
 
     if (rList.length > 300){
 	rList = rList.slice(1, 300);
