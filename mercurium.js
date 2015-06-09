@@ -33,6 +33,8 @@ var mouseDown = false;
 
 var pL = center/2; // pendulum bar length
 
+var dataLength = 0;
+var maxDataLength = 400;
 var rList = [];
 var thetaList = [];
 
@@ -40,6 +42,7 @@ var rSum = 0;
 var thetaSum = 0;
 var rAverage = 0;
 var thetaAverage = 0;
+
 
 //--------------~>
 var mercuriumMode = "write"; // read
@@ -190,11 +193,11 @@ function fillArea(x, y, color){
 }
 
 
-function calcVectorFromSignal(){
+function calcVectorsFromSignal(){
     
-    for (var x = 1; x < rList.length-1; x+=2){
+    for (var x = 1; x < rList.length-2; x+=1){
 	rA = rList[x];
-	tA = thetaList[x];	
+	tA = thetaList[x];
 
 	rB = rList[x+1];
 	tB = thetaList[x+1];
@@ -203,8 +206,8 @@ function calcVectorFromSignal(){
 	pointB = [rB*cos(tB), rB*sin(tB)];
 	
 	lineList.push([pointA, pointB]);
-	//drawLine(pointA, pointB);
     }
+    drawGraph();
 }
 
 function drawPendulum(){
@@ -235,12 +238,13 @@ function cycleSignals(){
     thetaList.push(theta);	
     rSum += r;
     thetaSum += theta;
+    dataLength++;
 
-    if (rList.length > 400){
+    if (rList.length > maxDataLength){
 	thetaSum -= thetaList[0];
 	rSum -= thetaList[0];
-	rList = rList.slice(1, 400);
-	thetaList = thetaList.slice(1, 400);
+	rList = rList.slice(1, maxDataLength);
+	thetaList = thetaList.slice(1, maxDataLength);
     }
 
     rAverage = rSum/rList.length;
@@ -251,8 +255,6 @@ function calcPendulum(){
     //drawPendulum();
     drawImage();
     
-
-
     if (mouseDown){
 	drawPoint();
 	cycleSignals();
