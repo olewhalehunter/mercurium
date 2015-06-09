@@ -5,8 +5,9 @@
 
  licended GNU AGPL3
 */
-
-// dat file signal -> image import
+// TD \/
+// fit trig functions to data
+// optimizing neighbor heatmap
 // create floodfill colors between lines
 // record dot map of floodfills
 
@@ -31,10 +32,10 @@ var point = [0, 0];
 var lastPoint = [0, 0];
 var mouseDown = false;
 
-var pL = center/2; // pendulum bar length
+var pL = center/2; // scaling factor/pendulum bar length
 
 var dataLength = 0;
-var maxDataLength = 400;
+var maxDataLength = 10000;
 var rList = [];
 var thetaList = [];
 
@@ -152,6 +153,7 @@ function clearImage(){
     thetaSum = 0;
     rAverage = 0;
     thetaAverage = 0;
+    dataLength = 0;
 }
 
 function rgbToHex(r, g, b) {
@@ -242,6 +244,7 @@ function cycleSignals(){
 
     if (rList.length > maxDataLength){
 	thetaSum -= thetaList[0];
+	dataLength = maxDataLength;
 	rSum -= thetaList[0];
 	rList = rList.slice(1, maxDataLength);
 	thetaList = thetaList.slice(1, maxDataLength);
