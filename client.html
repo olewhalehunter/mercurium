@@ -17,12 +17,24 @@ licended GNU AGPL3
 	<script src='mercurium.js' type='text/javascript'></script>
 	<script src='data.js' type='text/javascript'></script>
 
-	<button onclick="clearImage();">
-	    Clear Drawing
-	</button>
-
-	<button onclick="exportSignal();">
-	    Export Data
-	</button>
-
+	<div>
+	    <div>
+		<button onclick="clearImage();">
+		    Clear Drawing
+		</button>
+	    </div>
+	    <br>
+	    Import : 
+	    <input type="file" 
+		   value="import"
+		   value="Import Data" 
+		   onchange="importSignal(this)">
+	    </input>
+		   
+	    Export : 
+	    <button onclick="exportSignal();">
+		Download
+	    </button>
+	</div>
+	
 </body></html>

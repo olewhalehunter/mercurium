@@ -6,7 +6,6 @@
  licended GNU AGPL3
 */
 
-// image to signal export -> dat file
 // dat file signal -> image import
 // create floodfill colors between lines
 // record dot map of floodfills
@@ -41,6 +40,11 @@ var rSum = 0;
 var thetaSum = 0;
 var rAverage = 0;
 var thetaAverage = 0;
+
+//--------------~>
+var mercuriumMode = "write"; // read
+//--------------~>
+
 
 function print(message, x , y) {
     context.font = '8pt Calibri';
@@ -185,6 +189,24 @@ function fillArea(x, y, color){
     }
 }
 
+
+function calcVectorFromSignal(){
+    
+    for (var x = 1; x < rList.length-1; x+=2){
+	rA = rList[x];
+	tA = thetaList[x];	
+
+	rB = rList[x+1];
+	tB = thetaList[x+1];
+
+	pointA = [rA*cos(tA), rA*sin(tA)];
+	pointB = [rB*cos(tB), rB*sin(tB)];
+	
+	lineList.push([pointA, pointB]);
+	//drawLine(pointA, pointB);
+    }
+}
+
 function drawPendulum(){
     drawLine(jointB[0], jointB[1],
 	     jointA[0], jointA[1]);
@@ -248,11 +270,13 @@ canvas.addEventListener('mousemove', function(evt) {
     var mousePos = getMousePos(canvas, evt);
     drawGraph();
 
-    jointB = [(mousePos.x - center)/pL, 
-     	      (mousePos.y - center)/pL];
+    if (mercuriumMode = "write"){
+	jointB = [(mousePos.x - center)/pL, 
+     		  (mousePos.y - center)/pL];
 
-    if (distance( jointA, jointB) <= 2){
-	calcPendulum();
+	if (distance( jointA, jointB) <= 2){
+	    calcPendulum();
+	}
     }
   
     print("x,y: " + jointB[0] + "," + jointB[1]
@@ -277,18 +301,12 @@ function drawGraph(){
 
     // drawLine(0, 0, center, 0);
     // drawLine(0, 0, 0, center);
-
     // drawLine(0-center, 0, 0, 0);
     // drawLine(0, 0-center, 0, 0);
 
-    // print("X", 0+20, center-20);
-    // print("Y", center+20, 0+50);
     drawImage();
     graphSignals();
 }
 
 
 drawGraph();
-//drawPendulum();
-// print("x,y: " + jointB[0] + "," + jointB[1]
-//     , 20, 20);
